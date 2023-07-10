@@ -7,7 +7,7 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
-app.post('/product/create/', function (req, res) {
+app.post('/products/create/', function (req, res) {
     const newProduct = { id: uuidv4(), ...req.body };
     let list = [];
   
@@ -23,33 +23,33 @@ app.post('/product/create/', function (req, res) {
     });
     const length = list.length
     console.log(length);
-    res.json(newCar);
+    res.json(newProduct);
   });
   
-  app.get('/cars/', function (req, res) {
+  app.get('/products/', function (req, res) {
     const listAll = require('./inventory_list.json');
     res.json(listAll);
   });
   
-  app.get('/cars/:id', function (req, res) {
+  app.get('/products/:id', function (req, res) {
     const { id } = req.params;
     const listAll = require('./inventory_list.json');
-    const currentCar = listAll.find((car) => id == car.id);
-    if (currentCar) res.json(currentCar);
+    const currentProduct = listAll.find((product) => id == product.id);
+    if (currentProduct) res.json(currentProduct);
     else res.status(404).send();
   });
   
-  app.put('/cars/update/:id', function (req, res) {
+  app.put('/products/update/:id', function (req, res) {
     const { id } = req.params;
-    const carDetails = req.body;
+    const productDetails = req.body;
   
     const listAll = require('./inventory_list.json');
-    const currentCarIndex = listAll.findIndex((car) => id == car.id);
-    if (currentCarIndex == -1) {
+    const currentProductIndex = listAll.findIndex((product) => id == product.id);
+    if (currentProductIndex == -1) {
       res.status(404).send();
     } else {
       // update list
-      listAll[currentCarIndex] = { ...listAll[currentCarIndex], ...carDetails };
+      listAll[currentProductIndex] = { ...listAll[currentProductIndex], ...productDetails };
       //save to file
       fs.writeFileSync('inventory_list.json', JSON.stringify(listAll, null, 2), (error) => {
         if (error) console.log('error');
@@ -60,14 +60,14 @@ app.post('/product/create/', function (req, res) {
     }
   });
   
-  app.post('/cars/delete/:id', function (req, res) {
+  app.post('/products/delete/:id', function (req, res) {
     const { id } = req.params;
     const listAll = require('./inventory_list.json');
-    const currentCarIndex = listAll.findIndex((car) => id == car.id);
-    if (currentCarIndex == -1) console.log('error');
+    const currentProductIndex = listAll.findIndex((product) => id == product.id);
+    if (currentProductIndex == -1) console.log('error');
     else {
-      const carToArchives = listAll[currentCarIndex];
-      const updatedList = listAll.filter((car) => id != car.id);
+      const productToArchives = listAll[currentProductIndex];
+      const updatedList = listAll.filter((product) => id != product.id);
       fs.writeFileSync('inventory_list.json', JSON.stringify(updatedList, null, 2), (error) => {
         if (error) console.log('error');
         else console.log('succesfuly');
@@ -78,7 +78,7 @@ app.post('/product/create/', function (req, res) {
       if (fs.existsSync('archives_inventory_list.json')) {
         archivesList = require('./archives_inventory_list.json');
       }
-      archivesList.push(carToArchives);
+      archivesList.push(productToArchives);
   
       fs.writeFileSync('archives_inventory_list.json', JSON.stringify(archivesList, null, 2), (error) => {
         if (error) console.log('error');
