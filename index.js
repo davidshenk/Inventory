@@ -8,7 +8,7 @@ const port = 3000;
 app.use(bodyParser.json());
 
 app.post('/products/create/', function (req, res) {
-    const newProduct = { id: uuidv4(), ...req.body };
+    const newProduct = { uid: uuidv4(), ...req.body };
     let list = [];
   
     if (fs.existsSync('inventory_list.json')) {
