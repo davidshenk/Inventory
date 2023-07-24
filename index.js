@@ -1,3 +1,8 @@
+/*
+http://example.com/path/to/resource/123455?someQueryParam=2
+                   url              params query   
+*/
+
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -9,6 +14,8 @@ const {
   updateProductById,
   deleteProductById,
 } = require('./dal');
+const { logger } = require('./logger');
+const validator = require('./validator');
 const app = express();
 const port = 3000;
 
@@ -16,15 +23,7 @@ const port = 3000;
 const isTrue = (value) => (value + '').toLowerCase() === 'true';
 
 app.use(bodyParser.json());
-
-app.post('/products/', function (req, res) {
-  const newProduct = { uid: uuidv4(), ...req.body };
-
-  const productAdded = addProduct(newProduct);
-
-  if (productAdded) res.status(201).json(newProduct);
-  else res.status(400).json('Create product failed');
-});
+app.use(logger);
 
 app.get('/products/', function (req, res) {
   const { includeDeleted } = req.query;
@@ -41,6 +40,21 @@ app.get('/products/:uid', function (req, res) {
 
   if (product) res.json(product);
   else res.status(404).send();
+});
+
+app.post('/products/', function (req, res) {
+  const newProduct = { uid: uuidv4(), ...req.body };
+
+  const validationResult = validator.validateProduct(newProduct);
+  if (!validationResult.isValid) {
+    res.status(400).json(validationResult);
+    return;
+  }
+
+  const productAdded = addProduct(newProduct);
+
+  if (productAdded) res.status(201).json(newProduct);
+  else res.status(400).json('Create product failed');
 });
 
 app.put('/products/:uid', function (req, res) {
