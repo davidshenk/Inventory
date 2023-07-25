@@ -8,7 +8,13 @@ const express = require('express');
 const each = require('foreach');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
-const { readAllProducts, addProduct, getProductById, updateProductById, deleteProductById } = require('./dal');
+const {
+  readAllProducts,
+  addProduct,
+  getProductById,
+  updateProductById,
+  deleteProductById,
+} = require('./dal');
 const { logger } = require('./logger');
 const validator = require('./validator');
 const app = express();
@@ -52,27 +58,28 @@ app.post('/products/', function (req, res) {
   else res.status(400).json('Create product failed');
 });
 
-app.post('/products/arr/', function (req, res) {
+app.post('/products/bulkInsert/', function (req, res) {
   const productsArr = req.body;
 
-  each(productsArr, function (protuctObj, key, array) {
-    newProduct ={uid : uuidv4(),...protuctObj}
-    
-    
-    const validationResult = validator.validateProduct(newProduct);
+  if (!Array.isArray(productsArr)) {
+    res.status(400).send('invalid body content');
+    return;
+  }
+
+  const updatedProducts = productsArr.map((p) => ({ uid: uuidv4(), ...p }));
+
+  updatedProducts.forEach((p) => {
+    const validationResult = validator.validateProduct(p);
     if (!validationResult.isValid) {
       res.status(400).json(validationResult);
       return;
     }
-  
-    const productAdded = addProduct(newProduct);
-  
-    if (productAdded) res.status(201).json({ newProduct });
-    else res.status(400).json('Create product failed');
   });
-  // const newProduct = { uid: uuidv4(), ...element };
 
- 
+  const productsAdded = addProduct(updatedProducts);
+
+  if (productsAdded) res.status(201).json(updatedProducts);
+  else res.status(400).json('Create product failed');
 });
 
 app.put('/products/:uid', function (req, res) {
