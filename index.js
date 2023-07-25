@@ -106,4 +106,58 @@ app.delete('/products/:uid', function (req, res) {
   }
 });
 
+app.get('/', (req, res) => {
+  const availableMethods = [
+    {
+      method: 'get',
+      endpoint: '/products',
+      queryParams: [
+        {
+          key: 'includeDeleted',
+          value: 'bool',
+        },
+      ],
+      body: 'none',
+    },
+    {
+      method: 'get',
+      endpoint: '/products/:uid',
+      queryParams: [],
+      body: 'none',
+    },
+    {
+      method: 'post',
+      endpoint: '/products',
+      queryParams: [],
+      body: 'Object',
+    },
+    {
+      method: 'post',
+      endpoint: '/products/bulkInsert',
+      queryParams: [],
+      body: 'ArrayOfObjects',
+    },
+    {
+      method: 'put',
+      endpoint: '/products/:uid',
+      queryParams: [],
+      body: 'Object',
+    },
+    {
+      method: 'delete',
+      endpoint: '/products/:uid',
+      queryParams: [],
+      body: 'none',
+    },
+  ];
+
+  const response = {
+    appName: 'My API',
+    description: 'My API to manage products inventory',
+    methods: availableMethods,
+  };
+
+  res.json(response);
+});
+
 app.listen(port, () => console.log(`server is listening on http://localhost:${port}/`));
