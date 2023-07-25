@@ -3,9 +3,7 @@ http://example.com/path/to/resource/123455?someQueryParam=2
                    url              params query   
 */
 
-const fs = require('fs');
 const express = require('express');
-const each = require('foreach');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
 const {
