@@ -1,9 +1,14 @@
 const fs = require('fs');
 
 const dbFile = './inventory_list.json';
+const templateFile = './inventory_list_template.json';
 
 const readAllProducts = (includeDeleted = false) => {
-  if (!fs.existsSync(dbFile)) return [];
+  if (!fs.existsSync(dbFile)) {
+    if (fs.existsSync(templateFile)) {
+      fs.copyFileSync(templateFile, dbFile);
+    } else return [];
+  }
 
   const listStr = fs.readFileSync(dbFile, { encoding: 'utf8' });
   const list = JSON.parse(listStr);
