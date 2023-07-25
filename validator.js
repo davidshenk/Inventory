@@ -51,7 +51,7 @@ const validateProduct = (product) => {
     return result;
   }
 
-  if (product.images?.length === 0) {
+  if (!Array.isArray(product.images) || product.images.length < 1) {
     result.errorMessage = 'you must add at least 1 image';
     return result;
   }
