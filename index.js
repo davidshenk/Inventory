@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 const {
   readAllProducts,
   addProduct,
+  addProducts,
   getProductById,
   updateProductById,
   deleteProductById,
@@ -74,7 +75,7 @@ app.post('/products/bulkInsert/', function (req, res) {
     }
   });
 
-  const productsAdded = addProduct(updatedProducts);
+  const productsAdded = addProducts(updatedProducts);
 
   if (productsAdded) res.status(201).json(updatedProducts);
   else res.status(400).json('Create product failed');

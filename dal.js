@@ -22,8 +22,12 @@ const updateDB = (str) => {
 };
 
 const addProduct = (product) => {
-  let list = readAllProducts();
-  list.push(product);
+  const list = [...readAllProducts(), product];
+  return updateDB(JSON.stringify(list));
+};
+
+const addProducts = (products) => {
+  const list = [...readAllProducts(), ...products];
   return updateDB(JSON.stringify(list));
 };
 
@@ -56,6 +60,7 @@ const deleteProductById = (uid) => {
 const exportModules = {
   readAllProducts,
   addProduct,
+  addProducts,
   getProductById,
   updateProductById,
   deleteProductById,
