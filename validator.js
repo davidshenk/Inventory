@@ -17,47 +17,64 @@ const productSchema = {
 };
 
 const validateProduct = (product) => {
-  const result = { isValid: false, errorMessage: '' };
+  let errorMessage = '';
 
-  const schemaValidation = jsonschemaValidate(product, productSchema);
+  const schemaValidationRes = validateProductPropertyValue('schema', product);
+  if (!schemaValidationRes.isValid) {
+    errorMessage = schemaValidationRes.msg;
+  } else {
+    const propsToValiadate = ['title', 'brand', 'category', 'price', 'stock', 'images'];
 
-  if (!schemaValidation.valid) {
-    result.errorMessage = schemaValidation.errors;
-    return result;
+    propsToValiadate.forEach((prop) => {
+      const res = validateProductPropertyValue(prop, product[prop]);
+
+      if (!res.isValid) {
+        errorMessage = res.msg;
+        return;
+      }
+    });
   }
 
-  if (product.title.trim() === '') {
-    result.errorMessage = 'title is missing';
-    return result;
+  return { isValid: errorMessage === '', errorMessage };
+};
+
+const validateProductPropertyValue = (prop, value) => {
+  let msg = '';
+
+  switch (prop) {
+    case 'schema':
+      const schemaValidation = jsonschemaValidate(value, productSchema);
+      if (!schemaValidation.valid) {
+        msg = schemaValidation.errors;
+      }
+      break;
+
+    case 'title':
+    case 'brand':
+    case 'category':
+      if (value.trim() === '') {
+        msg = `${prop} is missing`;
+      }
+      break;
+
+    case 'price':
+    case 'stock':
+      if (+value < 0) {
+        msg = `${prop} cannot be less than 0`;
+      }
+      break;
+
+    case 'images':
+      if (!Array.isArray(value) || value.length < 1) {
+        msg = `at least 1 image is required`;
+      }
+      break;
+
+    default:
+      break;
   }
 
-  if (+product.price < 0) {
-    result.errorMessage = 'price is missing or cannot be less than 0';
-    return result;
-  }
-
-  if (+product.stock < 0) {
-    result.errorMessage = 'stock cannot be less than 0';
-    return result;
-  }
-
-  if (product.brand.trim() === '') {
-    result.errorMessage = 'brand is missing';
-    return result;
-  }
-
-  if (product.category.trim() === '') {
-    result.errorMessage = 'category is missing';
-    return result;
-  }
-
-  if (!Array.isArray(product.images) || product.images.length < 1) {
-    result.errorMessage = 'you must add at least 1 image';
-    return result;
-  }
-
-  result.isValid = true;
-  return result;
+  return { isValid: msg === '', msg };
 };
 
 const validator = { validateProduct };
