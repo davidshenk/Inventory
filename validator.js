@@ -1,20 +1,6 @@
 const jsonschemaValidate = require('jsonschema').validate;
 
-const productSchema = {
-  uid: 'string',
-  title: 'string',
-  description: 'string',
-  price: 'number',
-  rating: 'number',
-  stock: 'number',
-  brand: 'string',
-  category: 'string',
-  images: {
-    type: 'array',
-    items: { type: 'string' },
-  },
-  required: ['uid', 'title', 'price', 'stock', 'brand', 'category', 'images'],
-};
+
 
 const validateProduct = (product) => {
   let errorMessage = '';
@@ -28,7 +14,6 @@ const validateProduct = (product) => {
 
     if (!validationResult.isValid) {
       errorMessage = validationResult.msg;
-      //   return;
     }
   }
 
@@ -59,6 +44,22 @@ const validateProps = (props, product) => {
   }
 
   return { isValid: msg === '', msg };
+};
+
+const productSchema = {
+  uid: 'string',
+  title: 'string',
+  description: 'string',
+  price: 'number',
+  rating: 'number',
+  stock: 'number',
+  brand: 'string',
+  category: 'string',
+  images: {
+    type: 'array',
+    items: { type: 'string' },
+  },
+  required: ['uid', 'title', 'price', 'stock', 'brand', 'category', 'images'],
 };
 
 const validateProductPropertyValue = (prop, value) => {
