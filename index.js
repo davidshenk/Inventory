@@ -84,8 +84,14 @@ app.put('/products/:uid', function (req, res) {
   const { uid } = req.params;
   const product = req.body;
 
+  const validationResult = validator.validateUpdatedProduct(product);
+  if (!validationResult.isValid) {
+    res.status(400).json(validationResult);
+    return;
+  }
+
   if (uid !== product.uid) {
-    res.status(409).json('uid error');
+    res.status(409).json('uid mismatch');
     return;
   }
 

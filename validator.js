@@ -24,18 +24,41 @@ const validateProduct = (product) => {
     errorMessage = schemaValidationRes.msg;
   } else {
     const propsToValiadate = ['title', 'brand', 'category', 'price', 'stock', 'images'];
+    const validationResult = validateProps(propsToValiadate, product);
 
-    propsToValiadate.forEach((prop) => {
-      const res = validateProductPropertyValue(prop, product[prop]);
-
-      if (!res.isValid) {
-        errorMessage = res.msg;
-        return;
-      }
-    });
+    if (!validationResult.isValid) {
+      errorMessage = validationResult.msg;
+      //   return;
+    }
   }
 
   return { isValid: errorMessage === '', errorMessage };
+};
+
+const validateUpdatedProduct = (product) => {
+  const propsToValiadate = Object.keys(product).filter((k) => k !== 'uid');
+  const validationResult = validateProps(propsToValiadate, product);
+
+  return validationResult;
+};
+
+const validateProps = (props, product) => {
+  let msg = '';
+
+  try {
+    props.forEach((prop) => {
+      const res = validateProductPropertyValue(prop, product[prop]);
+
+      if (!res.isValid) {
+        msg = res.msg;
+        throw 'break';
+      }
+    });
+  } catch (e) {
+    if (e !== 'break') throw e;
+  }
+
+  return { isValid: msg === '', msg };
 };
 
 const validateProductPropertyValue = (prop, value) => {
@@ -77,5 +100,5 @@ const validateProductPropertyValue = (prop, value) => {
   return { isValid: msg === '', msg };
 };
 
-const validator = { validateProduct };
+const validator = { validateProduct, validateUpdatedProduct };
 module.exports = validator;
